@@ -89,7 +89,12 @@ class AlwaysSortGets
             return $token;
         }
 
-        $primaryKey = $this->schema->getPrimaryKey($this->getListName($token));
+        $listName = $this->getListName($token);
+        if (!$listName) { // We couldn't figure out the list name, so beat a cowardly retreat
+            return $token;
+        }
+
+        $primaryKey = $this->schema->getPrimaryKey($listName);
         if (!\in_array('slice', $functionList)) {
             return $this->insertSort($token, $primaryKey);
         }
@@ -99,13 +104,12 @@ class AlwaysSortGets
 
     private function insertSort($token, $primaryKey)
     {
-        $lhs = $token[2];
-        $token[2] = array(
+        $token[2][0] = array(
+            Parser::TYPE_FUNCTION,
+            'sort',
             array(
-                Parser::TYPE_FUNCTION,
-                'sort',
-                $lhs,
-                array(array(Parser::TYPE_PROPERTY, $primaryKey))
+                $token[2][0],
+                array(Parser::TYPE_PROPERTY, $primaryKey)
             )
         );
         return $token;
@@ -137,6 +141,17 @@ class AlwaysSortGets
 
     private function getListName($token)
     {
-        return '';
+        switch ($token[0]) {
+            case Parser::TYPE_FUNCTION: {
+                return (isset($token[2][0])) ? $this->getListName($token[2][0]) : null;
+            }
+            case Parser::TYPE_OBJECT: {
+                return (isset($token[1][0])) ? $this->getListName($token[1][0]) : null;
+            }
+            case Parser::TYPE_PROPERTY: {
+                return $token[1];
+            }
+        }
+        return null;
     }
 }
