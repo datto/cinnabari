@@ -2,6 +2,7 @@
 
 namespace Datto\Cinnabari\Tests;
 
+use Mockery;
 use Datto\Cinnabari\Optimizer;
 use Datto\Cinnabari\Parser;
 use PHPUnit_Framework_TestCase;
@@ -464,9 +465,7 @@ class OptimizerTest extends PHPUnit_Framework_TestCase
                     array(Parser::TYPE_PARAMETER, 'id')
                 ))
             )),
-            array(Parser::TYPE_OBJECT, array(
-                'id' => array(Parser::TYPE_PARAMETER, 'id')
-            ))
+            array(Parser::TYPE_PROPERTY, 'id')
         ));
 
         $output = array(Parser::TYPE_FUNCTION, 'insert', array(
@@ -477,9 +476,7 @@ class OptimizerTest extends PHPUnit_Framework_TestCase
                     array(Parser::TYPE_PARAMETER, 'id')
                 ))
             )),
-            array(Parser::TYPE_OBJECT, array(
-                'id' => array(Parser::TYPE_PARAMETER, 'id')
-            ))
+            array(Parser::TYPE_PROPERTY, 'id')
         ));
 
         $this->verify($input, $output);
@@ -642,7 +639,9 @@ class OptimizerTest extends PHPUnit_Framework_TestCase
 
     private function verify($input, $expectedOutput)
     {
-        $optimizer = new Optimizer();
+        $schema = \Mockery::mock('\Datto\Cinnabari\Schema');
+        $schema->shouldReceive('getPrimaryKey')->andReturn('id');
+        $optimizer = new Optimizer($schema);
         $actualOutput = $optimizer->optimize($input);
 
         $this->assertSame($expectedOutput, $actualOutput);

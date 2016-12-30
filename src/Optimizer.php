@@ -24,12 +24,21 @@
 
 namespace Datto\Cinnabari;
 
+use Datto\Cinnabari\Optimizer\AlwaysSortGets;
 use Datto\Cinnabari\Optimizer\RemoveUnusedSorts;
 use Datto\Cinnabari\Optimizer\InsertDirectly;
 use Datto\Cinnabari\Optimizer\FilterBeforeSort;
+use Datto\Cinnabari\Schema;
 
 class Optimizer
 {
+    private $schema;
+
+    public function __construct(Schema $schema)
+    {
+        $this->schema = $schema;
+    }
+
     public function optimize($request)
     {
         $request = $this->removeUnusedSorts($request);
@@ -60,7 +69,7 @@ class Optimizer
 
     private function alwaysSortGets($request)
     {
-        // Placeholder (for when this code is ready to release)
-        return $request;
+        $optimizer = new AlwaysSortGets($this->schema);
+        return $optimizer->optimize($request);
     }
 }
