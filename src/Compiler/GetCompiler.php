@@ -41,7 +41,7 @@ use Datto\Cinnabari\Mysql\Functions\Substring;
 use Datto\Cinnabari\Mysql\Functions\Sum;
 use Datto\Cinnabari\Mysql\Functions\Upper;
 use Datto\Cinnabari\Mysql\Identifier;
-use Datto\Cinnabari\Mysql\Literals\True;
+use Datto\Cinnabari\Mysql\Literals\TrueLiteral;
 use Datto\Cinnabari\Mysql\Operators\AndOperator;
 use Datto\Cinnabari\Mysql\Operators\Divides;
 use Datto\Cinnabari\Mysql\Operators\Equal;
@@ -395,7 +395,7 @@ class GetCompiler
     private function getCountExpression()
     {
         if (isset($this->subquery)) {
-            $true = new True();
+            $true = new TrueLiteral();
 
             $expressionId = $this->subquery->addExpression($true);
 
@@ -957,13 +957,17 @@ class GetCompiler
             $this->subqueryContext = $this->subquery->addJoin(
                 $this->subqueryContext,
                 $token['tableB'],
-                $token['expression']
+                $token['expression'],
+                $token['hasZero'],
+                $token['hasMany']
             );
         } else {
             $this->context = $this->mysql->addJoin(
                 $this->context,
                 $token['tableB'],
-                $token['expression']
+                $token['expression'],
+                $token['hasZero'],
+                $token['hasMany']
             );
         }
     }

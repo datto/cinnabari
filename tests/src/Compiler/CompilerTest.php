@@ -2100,7 +2100,7 @@ SELECT
     `2`.`Name` AS `3`
     FROM `People` AS `0`
     LEFT JOIN `Families` AS `1` ON `0`.`Id` <=> `1`.`Parent`
-    LEFT JOIN `People` AS `2` ON `1`.`Child` <=> `2`.`Id`
+    INNER JOIN `People` AS `2` ON `1`.`Child` <=> `2`.`Id`
 EOS;
 
         $phpInput = <<<'EOS'
@@ -2110,10 +2110,7 @@ EOS;
         $phpOutput = <<<'EOS'
 foreach ($input as $row) {
     $output[$row[0]]['name'] = $row[1];
-
-    if (isset($row[2])) {
-        $output[$row[0]]['children'][$row[2]] = $row[3];
-    }
+    $output[$row[0]]['children'][$row[2]] = $row[3];
 }
 
 $output = isset($output) ? array_values($output) : array();
