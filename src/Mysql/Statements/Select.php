@@ -33,6 +33,9 @@ class Select extends Expression
     const ORDER_ASCENDING = 1;
     const ORDER_DESCENDING = 2;
 
+    const JOIN_INNER = 'inner';
+    const JOIN_LEFT = 'left';
+
     /** @var string[] */
     private $columns;
 
@@ -107,10 +110,11 @@ class Select extends Expression
         return self::insert($this->columns, $name);
     }
 
-    public function addJoin($tableAId, $tableBIdentifier, $mysqlExpression)
+    public function addJoin($tableAId, $tableBIdentifier, $mysqlExpression, $hasZero, $hasMany)
     {
         $tableAIdentifier = self::getIdentifier($tableAId);
-        $join = new Table(json_encode(array($tableAIdentifier, $tableBIdentifier, $mysqlExpression)));
+        $joinType = ($hasZero || $hasMany) ? self::JOIN_LEFT : self::JOIN_INNER;
+        $join = new Table(json_encode(array($tableAIdentifier, $tableBIdentifier, $mysqlExpression, $joinType)));
         return self::appendOrFind($this->tables, $join);
     }
 
@@ -191,7 +195,7 @@ class Select extends Expression
 
         for ($id = 1; $id < count($this->tables); $id++) {
             $joinJson = $this->tables[$id]->getMysql();
-            list($tableAIdentifier, $tableBIdentifier, $expression) = json_decode($joinJson, true);
+            list($tableAIdentifier, $tableBIdentifier, $expression, $type) = json_decode($joinJson, true);
 
             $joinIdentifier = self::getIdentifier($id);
 
@@ -211,7 +215,13 @@ class Select extends Expression
             }
             $expression = implode(' ', $newExpression);
 
-            $mysql .= "\n\tLEFT JOIN {$tableBIdentifier} AS {$joinIdentifier} ON {$expression}";
+            if ($type === self::JOIN_INNER) {
+                $mysqlJoin = 'INNER JOIN';
+            } else {
+                $mysqlJoin = 'LEFT JOIN';
+            }
+
+            $mysql .= "\n\t{$mysqlJoin} {$tableBIdentifier} AS {$joinIdentifier} ON {$expression}";
         }
 
         return $mysql;
