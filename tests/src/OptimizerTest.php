@@ -2,6 +2,7 @@
 
 namespace Datto\Cinnabari\Tests;
 
+use Mockery;
 use Datto\Cinnabari\Optimizer;
 use Datto\Cinnabari\Parser;
 use PHPUnit_Framework_TestCase;
@@ -464,9 +465,7 @@ class OptimizerTest extends PHPUnit_Framework_TestCase
                     array(Parser::TYPE_PARAMETER, 'id')
                 ))
             )),
-            array(Parser::TYPE_OBJECT, array(
-                'id' => array(Parser::TYPE_PARAMETER, 'id')
-            ))
+            array(Parser::TYPE_PROPERTY, 'id')
         ));
 
         $output = array(Parser::TYPE_FUNCTION, 'insert', array(
@@ -477,9 +476,7 @@ class OptimizerTest extends PHPUnit_Framework_TestCase
                     array(Parser::TYPE_PARAMETER, 'id')
                 ))
             )),
-            array(Parser::TYPE_OBJECT, array(
-                'id' => array(Parser::TYPE_PARAMETER, 'id')
-            ))
+            array(Parser::TYPE_PROPERTY, 'id')
         ));
 
         $this->verify($input, $output);
@@ -640,9 +637,83 @@ class OptimizerTest extends PHPUnit_Framework_TestCase
         $this->verify($input, $output);
     }
 
-    private function verify($input, $expectedOutput)
+    public function testGetAddsSort()
     {
-        $optimizer = new Optimizer();
+        $input = array(Parser::TYPE_FUNCTION, 'get', array(
+            array(Parser::TYPE_FUNCTION, 'filter', array(
+                array(Parser::TYPE_PROPERTY, 'people'),
+                array(Parser::TYPE_FUNCTION, 'equal', array(
+                    array(Parser::TYPE_PROPERTY, 'age'),
+                    array(Parser::TYPE_PARAMETER, 'age')
+                ))
+            )),
+            array(Parser::TYPE_PROPERTY, 'id')
+        ));
+
+        $output = array(Parser::TYPE_FUNCTION, 'get', array(
+            array(Parser::TYPE_FUNCTION, 'sort', array(
+                array(Parser::TYPE_FUNCTION, 'filter', array(
+                    array(Parser::TYPE_PROPERTY, 'people'),
+                    array(Parser::TYPE_FUNCTION, 'equal', array(
+                        array(Parser::TYPE_PROPERTY, 'age'),
+                        array(Parser::TYPE_PARAMETER, 'age')
+                    ))
+                )),
+                array(Parser::TYPE_PROPERTY, 'personId')
+            )),
+            array(Parser::TYPE_PROPERTY, 'id')
+        ));
+
+        $this->verify($input, $output, 'people', 'personId');
+    }
+
+    public function testGetSliceAddsSort()
+    {
+        $input = array(Parser::TYPE_FUNCTION, 'get', array(
+            array(Parser::TYPE_FUNCTION, 'slice', array(
+                array(Parser::TYPE_FUNCTION, 'filter', array(
+                    array(Parser::TYPE_PROPERTY, 'people2'),
+                    array(Parser::TYPE_FUNCTION, 'equal', array(
+                        array(Parser::TYPE_PROPERTY, 'age'),
+                        array(Parser::TYPE_PARAMETER, 'age')
+                    ))
+                )),
+                array(Parser::TYPE_PARAMETER, ':begin'),
+                array(Parser::TYPE_PARAMETER, ':end')
+            )),
+            array(Parser::TYPE_PROPERTY, 'id')
+        ));
+
+        $output = array(Parser::TYPE_FUNCTION, 'get', array(
+            array(Parser::TYPE_FUNCTION, 'slice', array(
+                array(Parser::TYPE_FUNCTION, 'sort', array(
+                    array(Parser::TYPE_FUNCTION, 'filter', array(
+                        array(Parser::TYPE_PROPERTY, 'people2'),
+                        array(Parser::TYPE_FUNCTION, 'equal', array(
+                            array(Parser::TYPE_PROPERTY, 'age'),
+                            array(Parser::TYPE_PARAMETER, 'age')
+                        ))
+                    )),
+                    array(Parser::TYPE_PROPERTY, 'personId')
+                )),
+                array(Parser::TYPE_PARAMETER, ':begin'),
+                array(Parser::TYPE_PARAMETER, ':end'),
+            )),
+            array(Parser::TYPE_PROPERTY, 'id')
+        ));
+
+        $this->verify($input, $output, 'people2', 'personId');
+    }
+
+    private function verify($input, $expectedOutput, $listName = '', $idName = 'id')
+    {
+        $schema = \Mockery::mock('\Datto\Cinnabari\Schema');
+        $mock = $schema->shouldReceive('getPrimaryKey');
+        if ($listName) {
+            $mock = $mock->with($listName);
+        }
+        $mock->andReturn($idName);
+        $optimizer = new Optimizer($schema);
         $actualOutput = $optimizer->optimize($input);
 
         $this->assertSame($expectedOutput, $actualOutput);
