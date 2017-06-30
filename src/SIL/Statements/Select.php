@@ -1,0 +1,195 @@
+<?php
+
+/**
+ * Copyright (C) 2016 Datto, Inc.
+ *
+ * This file is part of Cinnabari.
+ *
+ * Cinnabari is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License, version 3,
+ * as published by the Free Software Foundation.
+ *
+ * Cinnabari is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Cinnabari. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author Spencer Mortensen <smortensen@datto.com>
+ * @license http://www.gnu.org/licenses/lgpl-3.0.html LGPL-3.0
+ * @copyright 2016 Datto, Inc.
+ */
+
+namespace Datto\Cinnabari\Result\SIL\Statements;
+
+use Datto\Cinnabari\Result\SIL\Expression;
+use Datto\Cinnabari\Result\SIL\Value;
+use Datto\Cinnabari\Result\SIL\Statements\Clauses\From;
+use Datto\Cinnabari\Result\SIL\Statements\Clauses\Having;
+use Datto\Cinnabari\Result\SIL\Statements\Clauses\Limit;
+use Datto\Cinnabari\Result\SIL\Statements\Clauses\GroupBy;
+use Datto\Cinnabari\Result\SIL\Statements\Clauses\Where;
+
+class Select extends AbstractStatement
+{
+    /** @var Expression */
+    private $where;
+
+    /** @var null|Expression */
+    private $groupBy;
+
+    /** @var null|Expression */
+    private $having;
+
+    /** @var null|Expression */
+    private $orderBy;
+
+    /** @var null|Expression */
+    private $limit;
+
+    /** @var array */
+    private $valueNames;
+
+    /** @var Value[] */
+    private $values;
+
+    /** @var null|From */
+    private $from;
+
+    public function __construct()
+    {
+        $this->where = null;
+        $this->groupBy = null;
+        $this->having = null;
+        $this->orderBy = null;
+        $this->limit = null;
+        $this->values = array();
+        $this->valueNames = array();
+        $this->from = null;
+        parent::__construct(true);
+    }
+
+    public function setFrom(From $from)
+    {
+        if ($this->from) {
+            throw new \Exception("Internal error", 0);
+        }
+
+        return $this->from = $from;
+    }
+
+    public function getFrom()
+    {
+        return $this->from;
+    }
+
+    public function setWhere(Where $where)
+    {
+        return $this->where = $where;
+    }
+
+    public function setGroupBy(Expression $groupBy)
+    {
+        if ($this->groupBy) {
+            throw new \Exception("Internal error", 0);
+        }
+        $this->groupBy = $groupBy;
+    }
+
+    public function setHaving(Expression $having)
+    {
+        if ($this->having) {
+            throw new \Exception("Internal error", 0);
+        }
+        $this->having = $having;
+    }
+
+    public function setOrderBy(Expression $orderBy)
+    {
+        if ($this->orderBy) {
+            throw new \Exception("Internal error", 0);
+        }
+        return $this->orderBy = $orderBy;
+    }
+
+    public function setLimit(Limit $limit)
+    {
+        if ($this->limit) {
+            throw new \Exception("Internal error", 0);
+        }
+        return $this->limit = $limit;
+    }
+
+    public function addValue(Value $value)
+    {
+        return $this->values[] = $value;
+    }
+
+    public function getValues()
+    {
+        return $this->values;
+    }
+
+    public function getMysql()
+    {
+        if ($this->getFrom() === null) {
+            // TODO
+            throw new \Exception("Internal error", 0);
+        }
+
+        if (count($this->values) === 0) {
+            // TODO
+            throw new \Exception("Internal error", 0);
+        }
+
+        $parts = array();
+
+        /** @var Value $value */
+        foreach ($this->values as $value) {
+            if (!$value->getIsList()) {
+                $parts[] = "\t" . $value->getMysql(true, true);
+            }
+        }
+        // $parts[] = implode(",\n\t", array_map('self::getValueMysql', $this->values));
+
+        $parts[] = $this->getFrom()->getMysql();
+
+        if (count($this->getJoins()) > 0) {
+            $parts[] = implode("\n\t", array_map('self::getExpressionMysql', $this->getJoins()));
+        }
+
+        if ($this->where !== null) {
+            $parts[] = $this->where->getMysql();
+        }
+
+        if ($this->groupBy !== null) {
+            $parts[] = $this->groupBy->getMysql();
+        }
+
+        if ($this->having !== null) {
+            $parts[] = $this->having->getMysql();
+        }
+
+        if ($this->orderBy !== null) {
+            $parts[] = $this->orderBy->getMysql();
+        }
+
+        if ($this->limit !== null) {
+            $parts[] = $this->limit->getMysql();
+        }
+
+        return "SELECT\n\t" . implode("\n\t", $parts);
+    }
+
+    protected static function getExpressionMysql(Expression $expression)
+    {
+        return $expression->getMysql();
+    }
+
+    protected static function getValueMysql(Value $value)
+    {
+        return $value->getMysql(true, true);
+    }
+}
