@@ -24,6 +24,7 @@
 
 namespace Datto\Cinnabari\Result\SIL\Statements;
 
+use Datto\Cinnabari\Exception;
 use Datto\Cinnabari\Result\SIL\Expression;
 use Datto\Cinnabari\Result\SIL\Statements\Clauses\Limit;
 use Datto\Cinnabari\Result\SIL\Statements\Clauses\OrderBy;
@@ -66,8 +67,7 @@ class Delete extends AbstractStatement
     public function getMysql()
     {
         if ($this->getTable() === null) {
-            // TODO
-            throw new \Exception("Internal error", 0);
+            throw Exception::internalError("Delete: multiple froms");
         }
 
         $parts[] = $this->getTable()->getMysql();

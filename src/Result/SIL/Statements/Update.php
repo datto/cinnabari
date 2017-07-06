@@ -24,8 +24,8 @@
 
 namespace Datto\Cinnabari\Result\SIL\Statements;
 
+use Datto\Cinnabari\Exception;
 use Datto\Cinnabari\Result\SIL\Expression;
-use Exception;
 
 class Update extends AbstractStatement
 {
@@ -58,13 +58,11 @@ class Update extends AbstractStatement
     public function getMysql()
     {
         if ($this->table === null) {
-            // TODO
-            throw new Exception;
+            throw Exception::internalError("Update: no table");
         }
 
         if (count($this->values) === 0) {
-            // TODO
-            throw new Exception;
+            throw Exception::internalError("Update: no values");
         }
 
         $parts = array();

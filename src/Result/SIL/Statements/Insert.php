@@ -24,8 +24,8 @@
 
 namespace Datto\Cinnabari\Result\SIL\Statements;
 
+use Datto\Cinnabari\Exception;
 use Datto\Cinnabari\Result\SIL\Expression;
-use Exception;
 
 class Insert extends AbstractStatement
 {
@@ -50,13 +50,11 @@ class Insert extends AbstractStatement
     public function getMysql()
     {
         if ($this->getTable() === null) {
-            // TODO
-            throw new Exception;
+            throw Exception::internalError("Insert: no table");
         }
 
         if (count($this->values) === 0) {
-            // TODO
-            throw new Exception;
+            throw Exception::internalError("Insert: no values");
         }
 
         $parts = array();

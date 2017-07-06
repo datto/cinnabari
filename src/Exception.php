@@ -26,6 +26,7 @@ namespace Datto\Cinnabari;
 
 class Exception extends \Exception
 {
+    const QUERY_INTERNAL_ERROR = 0;
     const QUERY_INVALID_TYPE = 1;
     const QUERY_INVALID_SYNTAX = 2;
     const QUERY_INVALID_PROPERTY_ACCESS = 3;
@@ -54,6 +55,21 @@ class Exception extends \Exception
     public function getData()
     {
         return $this->data;
+    }
+
+    public static function internalError($text = "")
+    {
+        $code = self::QUERY_INTERNAL_ERROR;
+
+        $message = "Internal error";
+
+        if (strlen($text) > 0) {
+            $message .= " ($text)";
+        }
+
+        $message .= ".";
+
+        return new self($code, null, $message);
     }
 
     public static function invalidType($input)

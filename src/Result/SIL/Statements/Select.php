@@ -24,12 +24,11 @@
 
 namespace Datto\Cinnabari\Result\SIL\Statements;
 
+use Datto\Cinnabari\Exception;
 use Datto\Cinnabari\Result\SIL\Expression;
 use Datto\Cinnabari\Result\SIL\Value;
 use Datto\Cinnabari\Result\SIL\Statements\Clauses\From;
-use Datto\Cinnabari\Result\SIL\Statements\Clauses\Having;
 use Datto\Cinnabari\Result\SIL\Statements\Clauses\Limit;
-use Datto\Cinnabari\Result\SIL\Statements\Clauses\GroupBy;
 use Datto\Cinnabari\Result\SIL\Statements\Clauses\Where;
 
 class Select extends AbstractStatement
@@ -74,7 +73,7 @@ class Select extends AbstractStatement
     public function setFrom(From $from)
     {
         if ($this->from) {
-            throw new \Exception("Internal error", 0);
+            throw Exception::internalError("Select: multiple froms");
         }
 
         return $this->from = $from;
@@ -93,7 +92,7 @@ class Select extends AbstractStatement
     public function setGroupBy(Expression $groupBy)
     {
         if ($this->groupBy) {
-            throw new \Exception("Internal error", 0);
+            throw Exception::internalError("Select: multiple groups");
         }
         $this->groupBy = $groupBy;
     }
@@ -101,7 +100,7 @@ class Select extends AbstractStatement
     public function setHaving(Expression $having)
     {
         if ($this->having) {
-            throw new \Exception("Internal error", 0);
+            throw Exception::internalError("Select: multiple havings");
         }
         $this->having = $having;
     }
@@ -109,7 +108,7 @@ class Select extends AbstractStatement
     public function setOrderBy(Expression $orderBy)
     {
         if ($this->orderBy) {
-            throw new \Exception("Internal error", 0);
+            throw Exception::internalError("Select: multiple orders");
         }
         return $this->orderBy = $orderBy;
     }
@@ -117,7 +116,7 @@ class Select extends AbstractStatement
     public function setLimit(Limit $limit)
     {
         if ($this->limit) {
-            throw new \Exception("Internal error", 0);
+            throw Exception::internalError("Select: multiple limits");
         }
         return $this->limit = $limit;
     }
@@ -135,13 +134,11 @@ class Select extends AbstractStatement
     public function getMysql()
     {
         if ($this->getFrom() === null) {
-            // TODO
-            throw new \Exception("Internal error", 0);
+            throw Exception::internalError("Select: no from");
         }
 
         if (count($this->values) === 0) {
-            // TODO
-            throw new \Exception("Internal error", 0);
+            throw Exception::internalError("Select: no values");
         }
 
         $parts = array();
@@ -149,10 +146,9 @@ class Select extends AbstractStatement
         /** @var Value $value */
         foreach ($this->values as $value) {
             if (!$value->getIsList()) {
-                $parts[] = "\t" . $value->getMysql(true, true);
+                $parts[] = $value->getMysql(true, true);
             }
         }
-        // $parts[] = implode(",\n\t", array_map('self::getValueMysql', $this->values));
 
         $parts[] = $this->getFrom()->getMysql();
 
