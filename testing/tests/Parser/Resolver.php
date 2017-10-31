@@ -12,7 +12,7 @@ use Datto\Cinnabari\Parser\Language\Properties;
 use Datto\Cinnabari\Parser\Language\Types;
 
 $functions = new Functions(); // Mock
-$properties = new Properties(array()); // Mock
+$properties = new Properties(); // Mock
 
 
 // Test

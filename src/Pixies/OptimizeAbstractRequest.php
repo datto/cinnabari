@@ -70,7 +70,7 @@ class OptimizeAbstractRequest
 
         /** @var FunctionNode $topNode */
 
-        if ($topNode->getName() !== 'filter') {
+        if ($topNode->getFunction() !== 'filter') {
             return $topNode;
         }
 
@@ -94,10 +94,10 @@ class OptimizeAbstractRequest
         $sortNode = $filterArguments[0];
 
         //////// filter(sort(a, b), c) => sort(filter(a, c), b)
-        if (in_array($sortNode->getName(), array('rsort', 'sort'))) {
+        if (in_array($sortNode->getFunction(), array('rsort', 'sort'))) {
             $sortArguments = $sortNode->getArguments();
             $newFilterNode = new FunctionNode('filter', array($sortArguments[0], $filterArguments[1]));
-            $newSortNode = new FunctionNode($sortNode->getName(), array($newFilterNode, $sortArguments[1]));
+            $newSortNode = new FunctionNode($sortNode->getFunction(), array($newFilterNode, $sortArguments[1]));
             $topNode = $newSortNode;
         }
 
@@ -134,7 +134,7 @@ class OptimizeAbstractRequest
         $useless = array('rsort', 'sort', 'slice', 'filter');
 
         //////// Perform more checking
-        if ($topNode->getName() !== 'insert'
+        if ($topNode->getFunction() !== 'insert'
             || $newArguments[0]->getNodeType() !== Node::TYPE_FUNCTION) {
             return $topNode;
         }
@@ -143,7 +143,7 @@ class OptimizeAbstractRequest
         $bottomNode = $newArguments[0];
 
         //////// If it's insert(useless(...)), make the change
-        if (in_array($bottomNode->getName(), $useless)) {
+        if (in_array($bottomNode->getFunction(), $useless)) {
             $bottomKids = $bottomNode->getArguments();
             $topNode->setArgument(0, $bottomKids[0]);
         }
@@ -175,7 +175,7 @@ class OptimizeAbstractRequest
         //////// If conditions are true, make the change
         if ($mode
             && $parent !== null
-            && in_array($topNode->getName(), array('sort', 'rsort'))) {
+            && in_array($topNode->getFunction(), array('sort', 'rsort'))) {
             /** @var FunctionNode $parent */
             $sortArguments = $topNode->getArguments();
             $parent->setArgument($indexWithinParent, $sortArguments[0]);  // orphanize the (r)sort
@@ -195,9 +195,9 @@ class OptimizeAbstractRequest
         );
 
         //////// Set mode flag
-        if (in_array($topNode->getName(), $interestingFunctions)) {
+        if (in_array($topNode->getFunction(), $interestingFunctions)) {
             $mode = true;   // if we subsequently see a sort below this, delete it
-        } elseif ($topNode->getName() == 'slice') {
+        } elseif ($topNode->getFunction() == 'slice') {
             $mode = false;  // A sort below a slice must not be removed
         }
 

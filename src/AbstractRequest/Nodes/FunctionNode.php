@@ -29,30 +29,30 @@ use Datto\Cinnabari\AbstractRequest\Node;
 class FunctionNode extends Node
 {
     /** @var string */
-    private $name;
+    private $function;
 
     /** @var Node[] */
     private $arguments;
 
     /**
-     * @param string $name
+     * @param string $function
      * @param Node[] $arguments
      * @param mixed $dataType
      */
-    public function __construct($name, array $arguments, $dataType = null)
+    public function __construct($function, array $arguments, $dataType = null)
     {
         parent::__construct(self::TYPE_FUNCTION, $dataType);
 
-        $this->name = $name;
+        $this->function = $function;
         $this->arguments = $arguments;
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getFunction()
     {
-        return $this->name;
+        return $this->function;
     }
 
     /**

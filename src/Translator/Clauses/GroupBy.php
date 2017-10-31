@@ -22,31 +22,31 @@
  * @copyright 2016, 2017 Datto, Inc.
  */
 
-namespace Datto\Cinnabari\AbstractRequest\Nodes;
+namespace Datto\Cinnabari\Translator\Clauses;
 
-use Datto\Cinnabari\AbstractRequest\Node;
-
-class OperatorNode extends Node
+class GroupBy extends Clause
 {
     /** @var string */
-    private $lexeme;
+    private $expression;
 
-    /**
-     * @param string $function
-     * @param mixed $dataType
-     */
-    public function __construct($function, $dataType = null)
+    /** @var boolean */
+    private $isDescending;
+
+    public function __construct($expression, $isAscending = false)
     {
-        parent::__construct(self::TYPE_OPERATOR, $dataType);
+        parent::__construct(Clause::TYPE_GROUP_BY);
 
-        $this->lexeme = $function;
+        $this->expression = $expression;
+        $this->isDescending = $isAscending;
     }
 
-    /**
-     * @return string
-     */
-    public function getLexeme()
+    public function getExpression()
     {
-        return $this->lexeme;
+        return $this->expression;
+    }
+
+    public function getIsDescending()
+    {
+        return $this->isDescending;
     }
 }

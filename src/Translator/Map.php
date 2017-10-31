@@ -24,11 +24,6 @@
 
 namespace Datto\Cinnabari\Translator;
 
-use Datto\Cinnabari\Translator\Nodes\JoinNode;
-use Datto\Cinnabari\Translator\Nodes\Node;
-use Datto\Cinnabari\Translator\Nodes\TableNode;
-use Datto\Cinnabari\Translator\Nodes\ValueNode;
-
 class Map
 {
     /** @var array */
@@ -66,31 +61,11 @@ class Map
                 return $output;
             }
 
-            $output[] = self::getNode($node);
+            $output[] = clone $node;
         }
 
         $this->class = null;
 
         return $output;
-    }
-
-    private static function getNode(array $array)
-    {
-        $type = $array[0];
-
-        switch ($type) {
-            case Node::TYPE_VALUE:
-                return new ValueNode($array[1]);
-
-            case Node::TYPE_TABLE:
-                return new TableNode($array[1]);
-
-            case Node::TYPE_JOIN:
-                return new JoinNode($array[1], $array[2], $array[3]);
-
-            default:
-                // TODO: throw exception
-                return null;
-        }
     }
 }

@@ -22,31 +22,46 @@
  * @copyright 2016, 2017 Datto, Inc.
  */
 
-namespace Datto\Cinnabari\AbstractRequest\Nodes;
+namespace Datto\Cinnabari\Translator\Nodes;
 
-use Datto\Cinnabari\AbstractRequest\Node;
-
-class OperatorNode extends Node
+class Value extends Node
 {
+    /** @var integer */
+    private $context;
+
     /** @var string */
-    private $lexeme;
+    private $expression;
 
     /**
-     * @param string $function
-     * @param mixed $dataType
+     * @param string $expression
      */
-    public function __construct($function, $dataType = null)
+    public function __construct($expression)
     {
-        parent::__construct(self::TYPE_OPERATOR, $dataType);
+        parent::__construct(Node::TYPE_VALUE);
 
-        $this->lexeme = $function;
+        $this->expression = $expression;
     }
 
-    /**
-     * @return string
-     */
-    public function getLexeme()
+    public function getExpression()
     {
-        return $this->lexeme;
+        return $this->expression;
+    }
+
+    public function getContext()
+    {
+        return $this->context;
+    }
+
+    public function setContext($context)
+    {
+        $this->context = $context;
+    }
+
+    public function getState()
+    {
+        return array(
+            $this->context,
+            $this->expression
+        );
     }
 }

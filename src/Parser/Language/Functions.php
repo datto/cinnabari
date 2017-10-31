@@ -199,6 +199,7 @@ class Functions
                 );
 
             case 'sort':
+            case 'rsort':
                 return array(
                     array(
                         array(Types::TYPE_ARRAY, array(Types::TYPE_OBJECT, '$x')),

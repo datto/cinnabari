@@ -136,7 +136,7 @@ class Analyzer
 
     private function readFunction(FunctionNode $function, &$context, &$id)
     {
-        $name = $function->getName();
+        $name = $function->getFunction();
         $keys = $this->getFunctionKeys($function, $context, $id);
 
         $this->constraints[] = $this->getFunctionOptions($name, $keys);

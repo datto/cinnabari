@@ -22,27 +22,22 @@
  * @copyright 2016, 2017 Datto, Inc.
  */
 
-namespace Datto\Cinnabari\Translator\Nodes;
+namespace Datto\Cinnabari\Translator\Clauses;
 
-class ValueNode extends Node
+class Having extends Clause
 {
-    /** @var string */
-    private $expression;
+    /** @var null|string */
+    private $having;
 
-    /**
-     * @param string $expression
-     */
-    public function __construct($expression)
+    public function __construct($having)
     {
-        parent::__construct(Node::TYPE_VALUE);
+        parent::__construct(Clause::TYPE_HAVING);
 
-        $this->expression = $expression;
+        $this->having = $having;
     }
 
-    public function __toString()
+    public function getHaving()
     {
-        $expressionText = var_export($this->expression);
-
-        return "VALUE({$expressionText})";
+        return $this->having;
     }
 }

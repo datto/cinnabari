@@ -24,25 +24,46 @@
 
 namespace Datto\Cinnabari\Translator\Nodes;
 
-class TableNode extends Node
+class Table extends Node
 {
     /** @var string */
     private $name;
 
-    /**
-     * @param string $expression
-     */
-    public function __construct($expression)
+    /** @var string */
+    private $id;
+
+    /** @var boolean */
+    private $hasMany;
+
+    public function __construct($table, $id, $hasMany)
     {
         parent::__construct(Node::TYPE_TABLE);
 
-        $this->name = $expression;
+        $this->name = $table;
+        $this->id = $id;
+        $this->hasMany = $hasMany;
     }
 
-    public function __toString()
+    public function getName()
     {
-        $nameText = var_export($this->name);
+        return $this->name;
+    }
 
-        return "TABLE({$nameText})";
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function hasMany()
+    {
+        return $this->hasMany;
+    }
+
+    public function getState()
+    {
+        return array(
+            $this->name,
+            $this->id
+        );
     }
 }

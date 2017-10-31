@@ -22,25 +22,32 @@
  * @copyright 2016, 2017 Datto, Inc.
  */
 
-namespace Datto\Cinnabari\Translator\Nodes;
+namespace Datto\Cinnabari\Translator\Clauses;
 
-class SortNode extends Node
+abstract class Clause
 {
-    /** @var string */
-    private $expression;
+    const TYPE_WHERE = 1;
+    const TYPE_GROUP_BY = 2;
+    const TYPE_HAVING = 3;
+    const TYPE_ORDER_BY = 4;
+    const TYPE_LIMIT = 5;
 
-    /** @var boolean */
-    private $ascending;
+    /** @var integer */
+    private $nodeType;
 
     /**
-     * @param string $expression
-     * @param boolean $ascending
+     * @param integer $nodeType
      */
-    public function __construct($expression, $ascending)
+    public function __construct($nodeType)
     {
-        parent::__construct(Node::TYPE_SORT);
+        $this->nodeType = $nodeType;
+    }
 
-        $this->expression = $expression;
-        $this->ascending = $ascending;
+    /**
+     * @return integer
+     */
+    public function getNodeType()
+    {
+        return $this->nodeType;
     }
 }

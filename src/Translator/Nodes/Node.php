@@ -29,27 +29,26 @@ abstract class Node
     const TYPE_SELECT = 1;
     const TYPE_TABLE = 2;
     const TYPE_JOIN = 3;
-    const TYPE_FILTER = 4;
-    const TYPE_SORT = 5;
-    const TYPE_SLICE = 6;
-    const TYPE_VALUE = 7;
+    const TYPE_VALUE = 4;
 
     /** @var integer */
-    private $tokenType;
+    private $nodeType;
 
     /**
-     * @param integer $tokenType
+     * @param integer $nodeType
      */
-    public function __construct($tokenType)
+    public function __construct($nodeType)
     {
-        $this->tokenType = $tokenType;
+        $this->nodeType = $nodeType;
     }
 
     /**
      * @return integer
      */
-    public function getTokenType()
+    public function getNodeType()
     {
-        return $this->tokenType;
+        return $this->nodeType;
     }
+
+    abstract public function getState();
 }

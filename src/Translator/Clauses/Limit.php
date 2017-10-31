@@ -22,25 +22,31 @@
  * @copyright 2016, 2017 Datto, Inc.
  */
 
-namespace Datto\Cinnabari\Translator\Nodes;
+namespace Datto\Cinnabari\Translator\Clauses;
 
-class SliceNode extends Node
+class Limit extends Clause
 {
-    /** @var string */
-    private $begin;
+    /** @var null|string */
+    private $offset;
 
-    /** @var string */
-    private $end;
+    /** @var null|string */
+    private $rowCount;
 
-    /**
-     * @param string $begin
-     * @param string $end
-     */
-    public function __construct($begin, $end)
+    public function __construct($offset, $rowCount)
     {
-        parent::__construct(Node::TYPE_SLICE);
+        parent::__construct(Clause::TYPE_LIMIT);
 
-        $this->begin = $begin;
-        $this->end = $end;
+        $this->offset = $offset;
+        $this->rowCount = $rowCount;
+    }
+
+    public function getOffset()
+    {
+        return $this->offset;
+    }
+
+    public function getRowCount()
+    {
+        return $this->rowCount;
     }
 }

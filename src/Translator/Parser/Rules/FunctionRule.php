@@ -22,20 +22,33 @@
  * @copyright 2016, 2017 Datto, Inc.
  */
 
-namespace Datto\Cinnabari\Translator\Nodes;
+namespace Datto\Cinnabari\Translator\Parser\Rules;
 
-class FilterNode extends Node
+use SpencerMortensen\Parser\Rule;
+
+class FunctionRule extends Rule
 {
     /** @var string */
-    private $expression;
+    private $function;
 
-    /**
-     * @param string $expression
-     */
-    public function __construct($expression)
+    /** @var array */
+    private $arguments;
+
+    public function __construct($name, $function, array $arguments, $callable = null)
     {
-        parent::__construct(Node::TYPE_FILTER);
+        parent::__construct($name, $callable);
 
-        $this->expression = $expression;
+        $this->function = $function;
+        $this->arguments = $arguments;
+    }
+
+    public function getFunction()
+    {
+        return $this->function;
+    }
+
+    public function getArguments()
+    {
+        return $this->arguments;
     }
 }

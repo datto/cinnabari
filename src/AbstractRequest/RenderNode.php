@@ -81,7 +81,7 @@ class RenderNode
 
     private static function renderFunction(FunctionNode $node)
     {
-        $name = $node->getName();
+        $name = $node->getFunction();
         $arguments = $node->getArguments();
 
         $renderedArguments = array_map('self::render', $arguments);

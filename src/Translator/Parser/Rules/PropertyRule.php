@@ -22,40 +22,10 @@
  * @copyright 2016, 2017 Datto, Inc.
  */
 
-namespace Datto\Cinnabari\Translator\Nodes;
+namespace Datto\Cinnabari\Translator\Parser\Rules;
 
-class SelectNode extends Node
+use SpencerMortensen\Parser\Rule;
+
+class PropertyRule extends Rule
 {
-    /** @var array */
-    private $tables;
-
-    /** @var array */
-    private $columns;
-
-    /** @var array */
-    private $clauses;
-
-    public function __construct()
-    {
-        parent::__construct(Node::TYPE_SELECT);
-
-        $this->tables = array();
-        $this->columns = array();
-        $this->clauses = array();
-    }
-
-    public function addTable($table)
-    {
-        $this->tables[] = $table;
-    }
-
-    public function addColumn($column)
-    {
-        $this->columns[] = $column;
-    }
-
-    public function addClause($clause)
-    {
-        $this->clauses[] = $clause;
-    }
 }

@@ -22,31 +22,27 @@
  * @copyright 2016, 2017 Datto, Inc.
  */
 
-namespace Datto\Cinnabari\AbstractRequest\Nodes;
+namespace Datto\Cinnabari\Translator;
 
-use Datto\Cinnabari\AbstractRequest\Node;
-
-class OperatorNode extends Node
+class Aliases
 {
-    /** @var string */
-    private $lexeme;
+    /** @var array */
+    private $aliases;
 
-    /**
-     * @param string $function
-     * @param mixed $dataType
-     */
-    public function __construct($function, $dataType = null)
+    public function __construct()
     {
-        parent::__construct(self::TYPE_OPERATOR, $dataType);
-
-        $this->lexeme = $function;
+        $this->aliases = array();
     }
 
-    /**
-     * @return string
-     */
-    public function getLexeme()
+    public function getAlias($value)
     {
-        return $this->lexeme;
+        $key = json_encode($value);
+        $alias = &$this->aliases[$key];
+
+        if (!isset($alias)) {
+            $alias = count($this->aliases) - 1;
+        }
+
+        return $alias;
     }
 }

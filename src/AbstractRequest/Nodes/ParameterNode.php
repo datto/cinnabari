@@ -32,14 +32,14 @@ class ParameterNode extends Node
     private $name;
 
     /**
-     * @param string $name
+     * @param string $function
      * @param mixed $dataType
      */
-    public function __construct($name, $dataType = null)
+    public function __construct($function, $dataType = null)
     {
         parent::__construct(self::TYPE_PARAMETER, $dataType);
 
-        $this->name = $name;
+        $this->name = $function;
     }
 
     /**

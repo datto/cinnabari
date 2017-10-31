@@ -24,37 +24,79 @@
 
 namespace Datto\Cinnabari\Translator\Nodes;
 
-class JoinNode extends Node
+class Join extends Node
 {
+    /** @var integer */
+    private $context;
+
     /** @var string */
     private $table;
+
+    /** @var integer */
+    private $id;
 
     /** @var string */
     private $condition;
 
     /** @var boolean */
-    private $isBijective;
+    private $hasZero;
 
-    /**
-     * @param string $table
-     * @param string $condition
-     * @param boolean $isBijective
-     */
-    public function __construct($table, $condition, $isBijective)
+    /** @var boolean */
+    private $hasMany;
+
+    public function __construct($table, $id, $condition, $hasZero, $hasMany)
     {
         parent::__construct(Node::TYPE_JOIN);
 
         $this->table = $table;
+        $this->id = $id;
         $this->condition = $condition;
-        $this->isBijective = $isBijective;
+        $this->hasZero = $hasZero;
+        $this->hasMany = $hasMany;
     }
 
-    public function __toString()
+    public function getContext()
     {
-        $tableText = var_export($this->table);
-        $conditionText = var_export($this->condition);
-        $isBijectiveText = json_encode($this->isBijective);
+        return $this->context;
+    }
 
-        return "EXPRESSION({$tableText}, {$conditionText}, {$isBijectiveText})";
+    public function setContext($context)
+    {
+        $this->context = $context;
+    }
+
+    public function getTable()
+    {
+        return $this->table;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getCondition()
+    {
+        return $this->condition;
+    }
+
+    public function hasZero()
+    {
+        return $this->hasZero;
+    }
+
+    public function hasMany()
+    {
+        return $this->hasMany;
+    }
+
+    public function getState()
+    {
+        return array(
+            $this->context,
+            $this->table,
+            $this->id,
+            $this->condition
+        );
     }
 }

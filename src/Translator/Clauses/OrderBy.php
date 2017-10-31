@@ -22,31 +22,40 @@
  * @copyright 2016, 2017 Datto, Inc.
  */
 
-namespace Datto\Cinnabari\AbstractRequest\Nodes;
+namespace Datto\Cinnabari\Translator\Clauses;
 
-use Datto\Cinnabari\AbstractRequest\Node;
-
-class OperatorNode extends Node
+class OrderBy extends Clause
 {
+    /** @var integer */
+    private $context;
+
     /** @var string */
-    private $lexeme;
+    private $expression;
 
-    /**
-     * @param string $function
-     * @param mixed $dataType
-     */
-    public function __construct($function, $dataType = null)
+    /** @var boolean */
+    private $isAscending;
+
+    public function __construct($context, $expression, $isAscending)
     {
-        parent::__construct(self::TYPE_OPERATOR, $dataType);
+        parent::__construct(Clause::TYPE_ORDER_BY);
 
-        $this->lexeme = $function;
+        $this->context = $context;
+        $this->expression = $expression;
+        $this->isAscending = $isAscending;
     }
 
-    /**
-     * @return string
-     */
-    public function getLexeme()
+    public function getContext()
     {
-        return $this->lexeme;
+        return $this->context;
+    }
+
+    public function getExpression()
+    {
+        return $this->expression;
+    }
+
+    public function isAscending()
+    {
+        return $this->isAscending;
     }
 }
