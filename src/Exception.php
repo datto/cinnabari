@@ -33,6 +33,7 @@ class Exception extends \Exception
     const QUERY_UNKNOWN_PROPERTY = 4;
     const QUERY_UNKNOWN_FUNCTION = 5;
     const QUERY_UNRESOLVABLE_TYPE_CONSTRAINTS = 6;
+    const QUERY_INVALID_GRAPHQL_QUERY = 7;
 
     /** @var mixed */
     private $data;
@@ -104,6 +105,24 @@ class Exception extends \Exception
         $tail = self::getTail($input, $position);
         $message = self::getExpectedMessage($expected, $tail, $lastParsed);
         $message .= ' on line ' . $line . ', character ' . $character;
+
+        return new self($code, $data, $message);
+    }
+
+    /**
+     * @param string  $message
+     * @param int     $line
+     * @param int     $column
+     */
+    public static function invalidGraphqlQuery($message, $line, $column)
+    {
+        $code = self::QUERY_INVALID_GRAPHQL_QUERY;
+
+        $data = array(
+            'statement'=> '',
+            'line' => $line,
+            'character' => $column,
+        );
 
         return new self($code, $data, $message);
     }
