@@ -529,8 +529,7 @@ class GraphqlParser
                             = $this->cinnabariParser->parse($argument1);
                     } catch (Exception $exception) {
                         throw self::createError(
-                            'Error in Cinnabari expression: '
-                            . $exception->getMessage(),
+                            'Cinnabari expression: ' . $exception->getMessage(),
                             $line,
                             0
                         );
@@ -581,7 +580,15 @@ class GraphqlParser
                 );
             } elseif ($fieldName === '_expr') {
                 $argument = str_replace('$', ':', $arguments['value'][0]);
-                $result = $this->cinnabariParser->parse($argument);
+                try {
+                    $result = $this->cinnabariParser->parse($argument);
+                } catch (Exception $exception) {
+                    throw self::createError(
+                        'Cinnabari expression: ' . $exception->getMessage(),
+                        $line,
+                        0
+                    );
+                }
             } else {
                 $result = new PropertyNode(array($fieldName));
             }
@@ -718,6 +725,8 @@ class GraphqlParser
      */
     public static function createError($message, $line, $column)
     {
+        $message = strtr($message, array("'" => ' ', '\\' => ' ', '"' => "'"));
+
         $error = '{"errors": [';
 
         $error .= '{';
@@ -730,7 +739,6 @@ class GraphqlParser
 
         $error .= '}';
         $error .= ']}';
-        $error = strtr($error, array("'" => ' ', '\\' => ' '));
 
         return Exception::invalidGraphqlQuery($error, $line, $column);
     }
@@ -760,11 +768,20 @@ class GraphqlParser
      */
     private function characterizeProperty($class, $property)
     {
-        $type = $this->properties->getDataType($class, $property);
         $isNullable = false;
         $isArray = false;
         $isObject = false;
         $underlyingType = null;
+
+        try {
+            $type = $this->properties->getDataType($class, $property);
+        } catch (Exception $exception) {
+            throw self::createError(
+                'Cinnabari expression: ' . $exception->getMessage(),
+                0,
+                0
+            );
+        }
 
         if ($type === null) {
             return array(null, null, null, null);
